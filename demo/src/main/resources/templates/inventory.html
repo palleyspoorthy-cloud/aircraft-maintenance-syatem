@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Component Spare Inventory</title>
+    <style>
+        :root {
+            --bg-main: #ffffff;
+            --bg-sidebar: #111827;
+            --text-dark: #111827;
+            --text-light: #ffffff;
+            --accent-blue: #2563eb;
+            --border-light: #e5e7eb;
+            --card-gray: #f9fafb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background-color: var(--bg-main); color: var(--text-dark); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            height: 100vh; display: flex;
+        }
+        
+        .sidebar { 
+            width: 260px; background-color: var(--bg-sidebar); color: var(--text-light);
+            padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; height: 100%;
+        }
+        .sidebar-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+        .sidebar-divider { border: 0; height: 1px; background: #374151; margin-bottom: 25px; }
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-link { color: #9ca3af; border-radius: 6px; padding: 12px; font-weight: 600; text-decoration: none; display: block; }
+        .nav-link.active, .nav-link:hover { background-color: var(--accent-blue); color: #ffffff; }
+
+        .main-panel { flex: 1; padding: 40px 50px; overflow-y: auto; }
+        .header-section { padding-bottom: 20px; border-bottom: 1px solid var(--border-light); margin-bottom: 35px; }
+        
+        .alert-banner-box {
+            background-color: #ffeeec; border: 1px solid #fecaca; border-radius: 8px;
+            padding: 15px 20px; color: #dc2626; font-size: 0.9rem; font-weight: 600; margin-bottom: 30px;
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .panel-box { background: #ffffff; border: 1px solid var(--border-light); border-radius: 10px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .panel-title { font-size: 1rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 20px; text-transform: uppercase; }
+
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .data-table th { color: #6b7280; font-size: 0.8rem; text-transform: uppercase; padding: 12px; border-bottom: 2px solid var(--border-light); }
+        .data-table td { padding: 14px 12px; font-size: 0.9rem; border-bottom: 1px solid var(--border-light); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: 6px; background-color: var(--card-gray); color: #000; }
+        .btn-submit { width: 100%; padding: 12px; background-color: var(--accent-blue); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        
+        .badge-danger { background: #ffeeec; color: #dc2626; border: 1px solid #fecaca; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+        .badge-normal { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-title">✈️ AIMS Portal</div>
+        <hr class="sidebar-divider">
+        <ul class="nav-list">
+            <li><a class="nav-link" href="/dashboard">🏠 Dashboard</a></li>
+            <li><a class="nav-link" href="/aircrafts">🛩️ Aircraft Fleet</a></li>
+            <li><a class="nav-link" href="/maintenance">🔧 Maintenance Records</a></li>
+            <li><a class="nav-link active" href="/inventory">⚙️ Spare Inventory</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-panel">
+        <div class="header-section">
+            <h2 style="font-size: 1.75rem; font-weight: 700;">⚙️ Warehouse Hardware Inventory Center</h2>
+            <p style="color: #6b7280; font-size: 0.9rem; margin-top: 4px;">Monitor airline structural supply levels, stock quantities, and bin locations.</p>
+        </div>
+
+        <div class="alert-banner-box" th:if="${!lowStockAlerts.isEmpty()}">
+            ⚠️ SYSTEM WARNING: CRITICAL LOW STOCK ALERT AT WORKSTATION
+            <ul style="margin-left: 20px; margin-top: 5px; font-weight: 500;">
+                <li th:each="alert : ${lowStockAlerts}" th:text="${alert.partName + ' (' + alert.partNumber + ') has fallen below safety line. Location: ' + alert.warehouseLocation}"></li>
+            </ul>
+        </div>
+
+        <div class="grid-layout">
+            <div class="panel-box">
+                <div class="panel-title">Stock Ledger Registry</div>
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Part Code</th>
+                                <th>Component Name</th>
+                                <th>Location Bin</th>
+                                <th>Qty Available</th>
+                                <th>Safety Limit</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="part : ${partsList}">
+                                <td style="font-weight: 700;" th:text="${part.partNumber}">ENG-001</td>
+                                <td th:text="${part.partName}">Engine Filter</td>
+                                <td th:text="${part.warehouseLocation}" style="color: #6b7280;">Bay A-3</td>
+                                <td th:text="${part.currentStock}" style="font-weight: 600;">12</td>
+                                <td th:text="${part.minimumStock}">5</td>
+                                <td>
+                                    <span th:if="${part.currentStock <= part.minimumStock}" class="badge-danger">LOW STOCK</span>
+                                    <span th:if="${part.currentStock > part.minimumStock}" class="badge-normal">STABLE</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel-box">
+                <div class="panel-title">➕ Catalog New Hardware</div>
+                <form th:action="@{/inventory/add}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Part Identification Number</label>
+                        <input type="text" name="partNumber" class="form-control" placeholder="e.g. HYD-502" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Component Name Description</label>
+                        <input type="text" name="partName" class="form-control" placeholder="e.g. Brake Pads" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Warehouse Bin Location</label>
+                        <input type="text" name="warehouseLocation" class="form-control" placeholder="e.g. Bay C-4" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Quantity Received</label>
+                        <input type="number" name="currentStock" class="form-control" placeholder="0" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Minimum Safety stock limit</label>
+                        <input type="number" name="minimumStock" class="form-control" placeholder="0" required min="0">
+                    </div>
+                    <button type="submit" class="btn-submit">Register Component Item</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

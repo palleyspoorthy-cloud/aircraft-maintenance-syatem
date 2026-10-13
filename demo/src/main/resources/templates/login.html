@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Corporate Security Gateway</title>
+    <!-- Premium Bootstrap Dashboard Core -->
+    <link rel="stylesheet" href="https://jsdelivr.net">
+    <style>
+        :root {
+            --bg-primary: #0f1115;
+            --panel-dark: #161920;
+            --accent-blue: #2f6fed;
+            --text-main: #f3f4f6;
+            --border-color: #262b35;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        .split-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Left Side: Premium Aviation Brand Showcase Panel */
+        .brand-panel {
+            flex: 1.2;
+            background: linear-gradient(135px, rgba(15, 17, 21, 0.85), rgba(47, 111, 237, 0.25)), 
+                        url('https://unsplash.com');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        /* Right Side: High-Security Operator Authentication Form */
+        .auth-panel {
+            flex: 0.9;
+            background-color: var(--panel-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        /* Business-grade Role Switcher Styling */
+        .role-toggle-group {
+            display: flex;
+            background-color: #121418;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .role-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #9ca3af;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-btn.active {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(47, 111, 237, 0.4);
+        }
+
+        .form-control {
+            background-color: #1a1e26;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 14px;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            background-color: #202630;
+            border-color: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(47, 111, 237, 0.25);
+        }
+
+        .btn-auth {
+            background-color: var(--accent-blue);
+            border: none;
+            color: white;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            letter-spacing: 0.02em;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-auth:hover {
+            background-color: #1d5bda;
+        }
+
+        .system-footer {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-container">
+        
+        <!-- Left Side Layout Banner View -->
+        <div class="brand-panel d-none d-md-flex">
+            <div>
+                <span class="badge bg-primary text-blue border border-secondary px-3 py-2 uppercase fw-bold tracking-wider">Enterprise Edition</span>
+            </div>
+            <div>
+                <h1 class="fw-bold text-white mb-2" style="font-size: 3rem; letter-spacing: -0.02em;">Global Aviation Portal & Grid.</h1>
+                <p class="text-light opacity-75 fs-5">Seamless Passenger check-in interfaces paired with secure Admin structural maintenance log configurations.</p>
+            </div>
+            <div class="system-footer">
+                &copy; 2026 Aero Management Systems Inc. All rights reserved. Security Protocols Active.
+            </div>
+        </div>
+
+        <!-- Right Side Form Gateway Input Grid -->
+        <div class="auth-panel">
+            <div class="auth-wrapper">
+                <div class="mb-4">
+                    <h2 class="fw-bold text-white mb-1" style="letter-spacing: -0.01em;">🔒 Gateway Login</h2>
+                    <p class="text-secondary small">Select your portal access clearance profile below.</p>
+                </div>
+
+                <!-- Business-grade Role Switcher Component Interface -->
+                <div class="mb-4">
+                    <label class="form-label d-block mb-2">Access Portal Type</label>
+                    <div class="role-toggle-group">
+                        <button type="button" id="btnAdmin" class="role-btn active" onclick="setRole('Admin')">⚙️ Administrator</button>
+                        <button type="button" id="btnPassenger" class="role-btn" onclick="setRole('Passenger')">🧳 Passenger</button>
+                    </div>
+                </div>
+
+                <form action="/dashboard" method="GET" id="loginForm">
+                    <!-- Dynamic Label changes based on chosen view selector -->
+                    <div class="mb-3">
+                        Operator Corporate ID</label>
+                        <input type="text" class="form-control" id="userInput" required placeholder="username@airline.com">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" id="passwordLabel">Access Token / Password</label>
+                        <input type="password" class="form-control" required placeholder="••••••••••••">
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label text-secondary small" for="rememberMe">Remember workstation</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small text-primary fw-medium">Forgot key?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-auth w-100 mb-3" id="submitBtn">Authenticate Workspace</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Frontend Interactive Role Script Module Toggle -->
+    <script>
+        function setRole(role) {
+            const btnAdmin = document.getElementById('btnAdmin');
+            const btnPassenger = document.getElementById('btnPassenger');
+            const identityLabel = document.getElementById('identityLabel');
+            const userInput = document.getElementById('userInput');
+            const loginForm = document.getElementById('loginForm');
+
+            if (role === 'Admin') {
+                btnAdmin.classList.add('active');
+                btnPassenger.classList.remove('active');
+                identityLabel.innerText = "Operator Corporate ID";
+                userInput.placeholder = "username@airline.com";
+                // System Admins go right into maintenance dashboard metrics grid
+                loginForm.action = "/dashboard";
+            } else {
+                btnPassenger.classList.add('active');
+                btnAdmin.classList.remove('active');
+                identityLabel.innerText = "Passport or Ticket Reference (PNR)";
+                userInput.placeholder = "e.g. X7R2QP";
+                // Passengers can be routed to a separate flight search route layout later
+                loginForm.action = "/"; 
+            }
+        }
+    </script>
+</body>
+</html>

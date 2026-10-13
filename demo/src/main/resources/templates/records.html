@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Maintenance Records</title>
+    <style>
+        :root {
+            --bg-main: #ffffff;
+            --bg-sidebar: #111827;
+            --text-dark: #111827;
+            --text-light: #ffffff;
+            --accent-blue: #2563eb;
+            --border-light: #e5e7eb;
+            --card-gray: #f9fafb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background-color: var(--bg-main); color: var(--text-dark); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            height: 100vh; display: flex;
+        }
+        
+        .sidebar { 
+            width: 260px; background-color: var(--bg-sidebar); color: var(--text-light);
+            padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; height: 100%;
+        }
+        .sidebar-title { color: #ffffff; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+        .sidebar-divider { border: 0; height: 1px; background: #374151; margin-bottom: 25px; }
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-link { 
+            color: #9ca3af; border-radius: 6px; padding: 12px; font-weight: 600;
+            font-size: 0.95rem; text-decoration: none; display: block; transition: all 0.2s ease;
+        }
+        .nav-link.active, .nav-link:hover { background-color: var(--accent-blue); color: #ffffff !important; }
+
+        .main-panel { flex: 1; padding: 40px 50px; overflow-y: auto; }
+        .header-section { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-light); margin-bottom: 35px; }
+        .header-title { font-size: 1.75rem; font-weight: 700; }
+
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .panel-box { background: #ffffff; border: 1px solid var(--border-light); border-radius: 10px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .panel-title { font-size: 1rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 20px; text-transform: uppercase; }
+
+        .table-responsive { width: 100%; overflow-x: auto; max-height: 600px; overflow-y: auto; }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .data-table th { color: #6b7280; font-size: 0.8rem; text-transform: uppercase; padding: 12px; border-bottom: 2px solid var(--border-light); }
+        .data-table td { padding: 14px 12px; font-size: 0.9rem; border-bottom: 1px solid var(--border-light); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
+        .form-control, .form-select { width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: 6px; background-color: var(--card-gray); color: var(--text-dark); }
+        .btn-submit { width: 100%; padding: 12px; background-color: var(--accent-blue); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .bg-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .bg-warning { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        .bg-info { background: #e0f2fe; color: #0369a1; border: 1px solid #b3e5fc; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-title">✈️ AIMS Portal</div>
+        <hr class="sidebar-divider">
+        <ul class="nav-list">
+            <li><a class="nav-link" href="/dashboard">🏠 Dashboard</a></li>
+            <li><a class="nav-link" href="/aircrafts">🛩️ Aircraft Fleet</a></li>
+            <li><a class="nav-link active" href="/maintenance">🔧 Maintenance Records</a></li>
+            <li><a class="nav-link" href="/inventory">⚙️ Spare Inventory</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-panel">
+        <div class="header-section">
+            <div>
+                <h2 class="header-title">🔧 Maintenance Tracking Logs</h2>
+                <p style="color: #6b7280; font-size: 0.9rem; margin-top: 4px;">Manage service profiles, inspection workflows, and technical logs.</p>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <div class="panel-box">
+                <div class="panel-title">Active Service Records</div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Aircraft</th>
+                                <th>Type</th>
+                                <th>Technician</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="record : ${recordsList}">
+                                <td style="font-weight: 700;" th:text="${record.aircraft.tailNumber}">VT-ABC</td>
+                                <td th:text="${record.maintenanceType}">A-Check</td>
+                                <td th:text="${record.technicianName}">Ravi Kumar</td>
+                                <td th:text="${record.dateStarted}">2026-10-13</td>
+                                <td>
+                                    <span th:if="${record.status == 'Completed'}" class="badge bg-success">Completed</span>
+                                    <span th:if="${record.status == 'In-Progress'}" class="badge bg-warning">In-Progress</span>
+                                    <span th:if="${record.status == 'Scheduled'}" class="badge bg-info">Scheduled</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel-box">
+                <div class="panel-title">🔧 Log Maintenance Activity</div>
+                <form th:action="@{/maintenance/add}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Target Aircraft</label>
+                        <select name="aircraftId" class="form-select" required>
+                            <option th:each="air : ${aircraftList}" th:value="${air.id}" th:text="${air.tailNumber + ' (' + air.model + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Inspection Type</label>
+                        <select name="maintenanceType" class="form-select">
+                            <option value="Daily Inspection">Daily Inspection</option>
+                            <option value="A-Check">A-Check</option>
+                            <option value="C-Check">C-Check</option>
+                            <option value="Engine Inspection">Engine Inspection</option>
+                            <option value="Avionics Check">Avionics Check</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Assigned Technician</label>
+                        <input type="text" name="technicianName" class="form-control" placeholder="Full Name" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Component Parts Replaced</label>
+                        <input type="text" name="partsUsed" class="form-control" placeholder="e.g. Filter, Seals" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Work Log Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="Task execution details" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Operations Status</label>
+                        <select name="status" class="form-select">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="In-Progress">In-Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Commit Log Entry</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

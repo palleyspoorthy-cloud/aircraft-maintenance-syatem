@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Aircraft Fleet Inventory</title>
+    <style>
+        :root {
+            --bg-main: #ffffff;
+            --bg-sidebar: #111827;
+            --text-dark: #111827;
+            --text-light: #ffffff;
+            --accent-blue: #2563eb;
+            --border-light: #e5e7eb;
+            --card-gray: #f9fafb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background-color: var(--bg-main); color: var(--text-dark); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            height: 100vh; overflow-x: hidden; display: flex;
+        }
+        
+        .sidebar { 
+            width: 260px; background-color: var(--bg-sidebar); color: var(--text-light);
+            padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; height: 100%;
+        }
+        .sidebar-title { color: #ffffff; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+        .sidebar-divider { border: 0; height: 1px; background: #374151; margin-bottom: 25px; }
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-link { 
+            color: #9ca3af; border-radius: 6px; padding: 12px; font-weight: 600;
+            font-size: 0.95rem; text-decoration: none; display: block; transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active { background-color: var(--accent-blue); color: #ffffff !important; }
+        
+        .main-panel { flex: 1; padding: 40px 50px; height: 100%; overflow-y: auto; }
+        .header-section { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-light); margin-bottom: 35px; }
+        .header-title { font-size: 1.75rem; font-weight: 700; color: var(--text-dark); }
+
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .panel-box { background-color: #ffffff; border: 1px solid var(--border-light); border-radius: 10px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .panel-title { font-size: 1rem; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
+        .form-control, .form-select { 
+            width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: 6px;
+            background-color: var(--card-gray) !important; color: var(--text-dark) !important; font-size: 0.95rem;
+            display: block !important; visibility: visible !important;
+        }
+        
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .data-table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 700; padding: 12px; border-bottom: 2px solid var(--border-light); }
+        .data-table td { padding: 14px 12px; font-size: 0.9rem; color: #374151; border-bottom: 1px solid var(--border-light); }
+        .table-hover-wrapper { max-height: 600px; overflow-y: auto; }
+        .table-tail-code { font-weight: 700; color: var(--text-dark); }
+        
+        .btn-submit { width: 100%; padding: 12px; background-color: var(--accent-blue); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; margin-top: 15px; }
+        .btn-submit:hover { background-color: #1d5bda; }
+
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .bg-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .bg-warning { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        .bg-danger { background: #ffeeec; color: #dc2626; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-title">✈️ AIMS Portal</div>
+        <hr class="sidebar-divider">
+        <ul class="nav-list">
+            <li><a class="nav-link" href="/dashboard">🏠 Dashboard</a></li>
+            <li><a class="nav-link active" href="/aircrafts">🛩️ Aircraft Fleet</a></li>
+            <li><a class="nav-link" href="/maintenance">🔧 Maintenance Records</a></li>
+            <li><a class="nav-link" href="/inventory">⚙️ Spare Inventory</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-panel">
+        <div class="header-section">
+            <div>
+                <h2 class="header-title">🛩️ Fleet Inventory Management</h2>
+                <p style="color: #6b7280; font-size: 0.9rem; margin-top: 4px;">Track airframe configurations, deployment profiles, and cycles logs.</p>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <div class="panel-box">
+                <div class="panel-title">Active Fleet Matrix</div>
+                <div class="table-hover-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tail Number</th>
+                                <th>Model Type</th>
+                                <th>Manufacturer</th>
+                                <th>Logged Hours</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="aircraft : ${aircraftList}">
+                                <td class="table-tail-code" th:text="${aircraft.tailNumber}">VT-ABC</td>
+                                <td th:text="${aircraft.model}" style="color: var(--accent-blue); font-weight: 500;">737 Max</td>
+                                <td th:text="${aircraft.manufacturer}">Boeing</td>
+                                <td th:text="${aircraft.totalFlightHours + ' hrs'}" style="font-weight: 600;">1420 hrs</td>
+                                <td>
+                                    <span th:if="${aircraft.status == 'Active'}" class="badge bg-success">Active</span>
+                                    <span th:if="${aircraft.status == 'Under Maintenance'}" class="badge bg-warning">In Maintenance</span>
+                                    <span th:if="${aircraft.status == 'Grounded'}" class="badge bg-danger">Grounded</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel-box">
+                <div class="panel-title">➕ Register Aircraft Asset</div>
+                <form th:action="@{/aircrafts/add}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Tail Registration Code</label>
+                        <input type="text" name="tailNumber" class="form-control" placeholder="e.g. VT-NEW" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Aircraft Model Variant</label>
+                        <input type="text" name="modelName" class="form-control" placeholder="e.g. A320 Neo" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Manufacturer Line</label>
+                        <input type="text" name="manufacturer" class="form-control" placeholder="e.g. Airbus" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Total Flight Cycles (Hours)</label>
+                        <input type="number" name="totalFlightHours" class="form-control" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deployment Status</label>
+                        <select name="status" class="form-select" required style="display: block !important; visibility: visible !important;">
+                            <option value="Active">Active</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                            <option value="Grounded">Grounded</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Commit Asset Entry</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
